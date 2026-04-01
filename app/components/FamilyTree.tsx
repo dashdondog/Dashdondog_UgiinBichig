@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -11,6 +11,7 @@ import ReactFlow, {
   useEdgesState,
   MarkerType,
   NodeMouseHandler,
+  ReactFlowInstance,
 } from 'reactflow';
 import dagre from '@dagrejs/dagre';
 import 'reactflow/dist/style.css';
@@ -20,6 +21,7 @@ import MemberDetail from './MemberDetail';
 
 interface Props {
   searchQuery: string;
+  focusTrigger?: number;
 }
 
 const NODE_W = 160;
@@ -47,11 +49,14 @@ function buildDagreLayout(members: FamilyMember[]) {
   return positions;
 }
 
-export default function FamilyTree({ searchQuery }: Props) {
+const HIGHLIGHT_ID = 'dashdondogG';
+
+export default function FamilyTree({ searchQuery, focusTrigger }: Props) {
   const members = seedMembers;
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const rfRef = useRef<ReactFlowInstance | null>(null);
 
   const selectedMember = selectedId ? members.find((m) => m.id === selectedId) : null;
 
@@ -63,6 +68,7 @@ export default function FamilyTree({ searchQuery }: Props) {
       const pos = positions.get(m.id) || { x: 0, y: 0 };
       const highlighted = !!searchQuery && m.name.toLowerCase().includes(lowerQ);
       const isSelected = m.id === selectedId;
+      const isDashdondog = m.id === HIGHLIGHT_ID;
       return {
         id: m.id,
         position: pos,
@@ -70,7 +76,9 @@ export default function FamilyTree({ searchQuery }: Props) {
           label: (
             <div
               className={`flex flex-col items-center gap-1 p-2 rounded-xl border-2 transition-all cursor-pointer
-                ${isSelected
+                ${isDashdondog
+                  ? 'border-amber-400 bg-amber-50 shadow-lg shadow-amber-200 ring-2 ring-amber-300'
+                  : isSelected
                   ? 'border-green-600 bg-green-50 shadow-lg shadow-green-200'
                   : highlighted
                   ? 'border-yellow-400 bg-yellow-50'
@@ -85,7 +93,7 @@ export default function FamilyTree({ searchQuery }: Props) {
                   {m.gender === 'female' ? '👩' : '👨'}
                 </div>
               )}
-              <p className="font-semibold text-xs text-gray-800 text-center leading-tight">{m.name}</p>
+              <p className={`font-semibold text-xs text-center leading-tight ${isDashdondog ? 'text-amber-700 font-bold' : 'text-gray-800'}`}>{m.name}</p>
               {m.birthDate && (
                 <p className="text-[10px] text-gray-400">
                   {new Date(m.birthDate).getFullYear()}
@@ -142,6 +150,12 @@ export default function FamilyTree({ searchQuery }: Props) {
     buildGraph();
   }, [buildGraph]);
 
+  useEffect(() => {
+    if (focusTrigger && rfRef.current) {
+      rfRef.current.fitView({ nodes: [{ id: HIGHLIGHT_ID }], duration: 600, padding: 0.6 });
+    }
+  }, [focusTrigger]);
+
   const handleNodeClick: NodeMouseHandler = useCallback((_e, node) => {
     setSelectedId((prev) => (prev === node.id ? null : node.id));
   }, []);
@@ -155,6 +169,7 @@ export default function FamilyTree({ searchQuery }: Props) {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeClick={handleNodeClick}
+          onInit={(instance) => { rfRef.current = instance; }}
           fitView
           fitViewOptions={{ padding: 0.15 }}
           minZoom={0.05}

@@ -8,6 +8,7 @@ const FamilyTree = dynamic(() => import('./components/FamilyTree'), { ssr: false
 
 export default function Home() {
   const [search, setSearch] = useState('');
+  const [focusTrigger, setFocusTrigger] = useState(0);
 
   return (
     <div className="flex flex-col h-screen bg-green-50">
@@ -20,10 +21,18 @@ export default function Home() {
             <p className="text-[10px] text-gray-400 leading-tight">С.Гиймаа · Г.Лонжид</p>
           </div>
         </div>
-        <SearchBar value={search} onChange={setSearch} />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setFocusTrigger((t) => t + 1)}
+            className="flex items-center gap-1 px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-white text-xs font-bold rounded-lg shadow transition-colors whitespace-nowrap"
+          >
+            ⭐ Г.Дашдондог
+          </button>
+          <SearchBar value={search} onChange={setSearch} />
+        </div>
       </header>
 
-      <FamilyTree searchQuery={search} />
+      <FamilyTree searchQuery={search} focusTrigger={focusTrigger} />
 
       {/* Legend — desktop only */}
       <div className="hidden sm:flex fixed bottom-4 left-4 bg-white border border-green-100 rounded-xl px-4 py-2 shadow text-xs text-gray-500 gap-4">
