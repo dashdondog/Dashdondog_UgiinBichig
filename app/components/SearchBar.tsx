@@ -14,7 +14,7 @@ export default function SearchBar({ value, onChange }: Props) {
         placeholder="Хайх..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="pl-8 pr-4 py-2 border border-green-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400 bg-white w-48"
+        className="pl-8 pr-4 py-2 border border-green-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400 bg-white w-32 sm:w-48"
       />
       {value && (
         <button
