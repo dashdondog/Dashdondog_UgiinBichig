@@ -24,7 +24,7 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setFocusTrigger((t) => t + 1)}
-            className="flex items-center gap-1 px-3 py-1.5 bg-amber-400 hover:bg-amber-500 text-white text-xs font-bold rounded-lg shadow transition-colors whitespace-nowrap"
+            className="flex items-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg shadow transition-colors whitespace-nowrap"
           >
             ⭐ Г.Дашдондог
           </button>
